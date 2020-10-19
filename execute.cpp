@@ -1,6 +1,6 @@
 #include "thumbsim.hpp"
 // These are just the register NUMBERS
-#define PC_REG 15  
+#define PC_REG 15
 #define LR_REG 14
 #define SP_REG 13
 
@@ -32,41 +32,37 @@ ASPR flags;
 // one parameter as input, the result of whatever operation is executing
 
 // This function is complete, you should not have to modify it
-void setCarryOverflow (int num1, int num2, OFType oftype) {
+void setCarryOverflow(int num1, int num2, OFType oftype) {
   switch (oftype) {
     case OF_ADD:
       if (((unsigned long long int)num1 + (unsigned long long int)num2) ==
           ((unsigned int)num1 + (unsigned int)num2)) {
         flags.C = 0;
-      }
-      else {
+      } else {
         flags.C = 1;
       }
       if (((long long int)num1 + (long long int)num2) ==
           ((int)num1 + (int)num2)) {
         flags.V = 0;
-      }
-      else {
+      } else {
         flags.V = 1;
       }
       break;
     case OF_SUB:
       if (num1 >= num2) {
         flags.C = 1;
-      }
-      else if (((unsigned long long int)num1 - (unsigned long long int)num2) ==
-          ((unsigned int)num1 - (unsigned int)num2)) {
+      } else if (((unsigned long long int)num1 -
+                  (unsigned long long int)num2) ==
+                 ((unsigned int)num1 - (unsigned int)num2)) {
         flags.C = 0;
-      }
-      else {
+      } else {
         flags.C = 1;
       }
-      if (((num1==0) && (num2==0)) ||
+      if (((num1 == 0) && (num2 == 0)) ||
           (((long long int)num1 - (long long int)num2) ==
            ((int)num1 - (int)num2))) {
         flags.V = 0;
-      }
-      else {
+      } else {
         flags.V = 1;
       }
       break;
@@ -76,8 +72,7 @@ void setCarryOverflow (int num1, int num2, OFType oftype) {
         if (((unsigned long long int)num1 << (unsigned long long int)num2) ==
             ((unsigned int)num1 << (unsigned int)num2)) {
           flags.C = 0;
-        }
-        else {
+        } else {
           flags.C = 1;
         }
       }
@@ -89,40 +84,79 @@ void setCarryOverflow (int num1, int num2, OFType oftype) {
   }
 }
 
-// CPE 315: You're given the code for evaluating BEQ, and you'll need to 
+// CPE 315: You're given the code for evaluating BEQ, and you'll need to
 // complete the rest of these conditions. See Page 208 of the armv7 manual
 static int checkCondition(unsigned short cond) {
-  switch(cond) {
+  switch (cond) {
     case EQ:
       if (flags.Z == 1) {
         return TRUE;
       }
       break;
     case NE:
+      if (flags.Z == 0) {
+        return TRUE;
+      }
       break;
     case CS:
+      if (flags.C == 1) {
+        return TRUE;
+      }
       break;
     case CC:
+      if (flags.C == 0) {
+        return TRUE;
+      }
       break;
     case MI:
+      if (flags.N == 1) {
+        return TRUE;
+      }
       break;
     case PL:
+      if (flags.N == 0) {
+        return TRUE;
+      }
       break;
     case VS:
+      if (flags.V == 1) {
+        return TRUE;
+      }
       break;
     case VC:
+      if (flags.V == 0) {
+        return TRUE;
+      }
       break;
     case HI:
+      if (flags.C == 1 && flags.Z == 0) {
+        return TRUE;
+      }
       break;
     case LS:
+      if (flags.C == 0 || flags.Z == 1) {
+        return TRUE;
+      }
       break;
     case GE:
+      if (flags.N == flags.V) {
+        return TRUE;
+      }
       break;
     case LT:
+      if (flags.N != flags.V) {
+        return TRUE;
+      }
       break;
     case GT:
+      if (flags.Z == 0 && flags.N == flags.V) {
+        return TRUE;
+      }
       break;
     case LE:
+      if (flags.Z == 1 || flags.N != flags.V) {
+        return TRUE;
+      }
       break;
     case AL:
       return TRUE;
@@ -134,7 +168,7 @@ static int checkCondition(unsigned short cond) {
 void execute() {
   Data16 instr = imem[PC];
   Data16 instr2;
-  Data32 temp(0); // Use this for STRB instructions
+  Data32 temp(0);  // Use this for STRB instructions
   Thumb_Types itype;
   // the following counts as a read to PC
   unsigned int pctarget = PC + 2;
@@ -174,21 +208,23 @@ void execute() {
   // CPE 315: The bulk of your work is in the following switch statement
   // All instructions will need to have stats and cache access info added
   // as appropriate for that instruction.
-  switch(itype) {
+  switch (itype) {
     case ALU:
       add_ops = decode(alu);
-      switch(add_ops) {
+      switch (add_ops) {
         case ALU_LSLI:
           break;
         case ALU_ADDR:
           // needs stats and flags
-          rf.write(alu.instr.addr.rd, rf[alu.instr.addr.rn] + rf[alu.instr.addr.rm]);
+          rf.write(alu.instr.addr.rd,
+                   rf[alu.instr.addr.rn] + rf[alu.instr.addr.rm]);
           break;
         case ALU_SUBR:
           break;
         case ALU_ADD3I:
           // needs stats and flags
-          rf.write(alu.instr.add3i.rd, rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
+          rf.write(alu.instr.add3i.rd,
+                   rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
           break;
         case ALU_SUB3I:
           break;
@@ -200,7 +236,8 @@ void execute() {
           break;
         case ALU_ADD8I:
           // needs stats and flags
-          rf.write(alu.instr.add8i.rdn, rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
+          rf.write(alu.instr.add8i.rdn,
+                   rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
           break;
         case ALU_SUB8I:
           break;
@@ -210,7 +247,7 @@ void execute() {
           break;
       }
       break;
-    case BL: 
+    case BL:
       // This instruction is complete, nothing needed here
       bl_ops = decode(blupper);
       if (bl_ops == BL_UPPER) {
@@ -218,15 +255,16 @@ void execute() {
         instr2 = imem[PC];
         BL_Type bllower(instr2);
         if (blupper.instr.bl_upper.s) {
-          addr = static_cast<unsigned int>(0xff<<24) | 
-            ((~(bllower.instr.bl_lower.j1 ^ blupper.instr.bl_upper.s))<<23) |
-            ((~(bllower.instr.bl_lower.j2 ^ blupper.instr.bl_upper.s))<<22) |
-            ((blupper.instr.bl_upper.imm10)<<12) |
-            ((bllower.instr.bl_lower.imm11)<<1);
-        }
-        else {
-          addr = ((blupper.instr.bl_upper.imm10)<<12) |
-            ((bllower.instr.bl_lower.imm11)<<1);
+          addr = static_cast<unsigned int>(0xff << 24) |
+                 ((~(bllower.instr.bl_lower.j1 ^ blupper.instr.bl_upper.s))
+                  << 23) |
+                 ((~(bllower.instr.bl_lower.j2 ^ blupper.instr.bl_upper.s))
+                  << 22) |
+                 ((blupper.instr.bl_upper.imm10) << 12) |
+                 ((bllower.instr.bl_lower.imm11) << 1);
+        } else {
+          addr = ((blupper.instr.bl_upper.imm10) << 12) |
+                 ((bllower.instr.bl_lower.imm11) << 1);
         }
         // return address is 4-bytes away from the start of the BL insn
         rf.write(LR_REG, PC + 2);
@@ -234,16 +272,15 @@ void execute() {
         rf.write(PC_REG, PC + 2 + addr);
 
         stats.numRegReads += 1;
-        stats.numRegWrites += 2; 
-      }
-      else {
+        stats.numRegWrites += 2;
+      } else {
         cerr << "Bad BL format." << endl;
         exit(1);
       }
       break;
     case DP:
       dp_ops = decode(dp);
-      switch(dp_ops) {
+      switch (dp_ops) {
         case DP_CMP:
           // need to implement
           break;
@@ -251,10 +288,11 @@ void execute() {
       break;
     case SPECIAL:
       sp_ops = decode(sp);
-      switch(sp_ops) {
+      switch (sp_ops) {
         case SP_MOV:
           // needs stats and flags
-          rf.write((sp.instr.mov.d << 3 ) | sp.instr.mov.rd, rf[sp.instr.mov.rm]);
+          rf.write((sp.instr.mov.d << 3) | sp.instr.mov.rd,
+                   rf[sp.instr.mov.rm]);
           break;
         case SP_ADD:
         case SP_CMP:
@@ -266,7 +304,7 @@ void execute() {
       // You'll want to use these load and store models
       // to implement ldrb/strb, ldm/stm and push/pop
       ldst_ops = decode(ld_st);
-      switch(ldst_ops) {
+      switch (ldst_ops) {
         case STRI:
           // functionally complete, needs stats
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4;
@@ -299,7 +337,7 @@ void execute() {
       break;
     case MISC:
       misc_ops = decode(misc);
-      switch(misc_ops) {
+      switch (misc_ops) {
         case MISC_PUSH:
           // need to implement
           break;
@@ -308,11 +346,11 @@ void execute() {
           break;
         case MISC_SUB:
           // functionally complete, needs stats
-          rf.write(SP_REG, SP - (misc.instr.sub.imm*4));
+          rf.write(SP_REG, SP - (misc.instr.sub.imm * 4));
           break;
         case MISC_ADD:
           // functionally complete, needs stats
-          rf.write(SP_REG, SP + (misc.instr.add.imm*4));
+          rf.write(SP_REG, SP + (misc.instr.add.imm * 4));
           break;
       }
       break;
@@ -321,7 +359,7 @@ void execute() {
       // Once you've completed the checkCondition function,
       // this should work for all your conditional branches.
       // needs stats
-      if (checkCondition(cond.instr.b.cond)){
+      if (checkCondition(cond.instr.b.cond)) {
         rf.write(PC_REG, PC + 2 * signExtend8to32ui(cond.instr.b.imm) + 2);
       }
       break;
@@ -343,13 +381,12 @@ void execute() {
       decode(ldrl);
       // Need to check for alignment by 4
       if (PC & 2) {
-        addr = PC + 2 + (ldrl.instr.ldrl.imm)*4;
-      }
-      else {
-        addr = PC + (ldrl.instr.ldrl.imm)*4;
+        addr = PC + 2 + (ldrl.instr.ldrl.imm) * 4;
+      } else {
+        addr = PC + (ldrl.instr.ldrl.imm) * 4;
       }
       // Requires two consecutive imem locations pieced together
-      temp = imem[addr] | (imem[addr+2]<<16);  // temp is a Data32
+      temp = imem[addr] | (imem[addr + 2] << 16);  // temp is a Data32
       rf.write(ldrl.instr.ldrl.rt, temp);
 
       // One write for updated reg
@@ -362,7 +399,7 @@ void execute() {
     case ADD_SP:
       // needs stats
       decode(addsp);
-      rf.write(addsp.instr.add.rd, SP + (addsp.instr.add.imm*4));
+      rf.write(addsp.instr.add.rd, SP + (addsp.instr.add.imm * 4));
       break;
     default:
       cout << "[ERROR] Unknown Instruction to be executed" << endl;
