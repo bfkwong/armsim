@@ -15,6 +15,10 @@ Caches caches(0);
 // CPE 315: you'll need to implement a custom sign-extension function
 // in addition to the ones given below, specifically for the unconditional
 // branch instruction, which has an 11-bit immediate field
+unsigned int signExtend11to32ui(short i) {
+  return static_cast<unsigned int>(static_cast<int>(i));
+}
+
 unsigned int signExtend16to32ui(short i) {
   return static_cast<unsigned int>(static_cast<int>(i));
 }
@@ -220,6 +224,8 @@ void execute() {
                    rf[alu.instr.addr.rn] + rf[alu.instr.addr.rm]);
           break;
         case ALU_SUBR:
+          rf.write(alu.instr.addr.rd,
+                   rf[alu.instr.addr.rn] - rf[alu.instr.addr.rm]);
           break;
         case ALU_ADD3I:
           // needs stats and flags
@@ -227,6 +233,8 @@ void execute() {
                    rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
           break;
         case ALU_SUB3I:
+          rf.write(alu.instr.add3i.rd,
+                   rf[alu.instr.add3i.rn] - alu.instr.add3i.imm);
           break;
         case ALU_MOV:
           // needs stats and flags
@@ -240,6 +248,8 @@ void execute() {
                    rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
           break;
         case ALU_SUB8I:
+          rf.write(alu.instr.add8i.rdn,
+                   rf[alu.instr.add8i.rdn] - alu.instr.add8i.imm);
           break;
         default:
           cout << "instruction not implemented" << endl;
@@ -316,10 +326,14 @@ void execute() {
           rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr]);
           break;
         case STRR:
-          // need to implement
+          addr =
+              rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm] * 4;
+          dmem.write(addr, rf[ld_st.instr.ld_st_reg.rt]);
           break;
         case LDRR:
-          // need to implement
+          addr =
+              rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm] * 4;
+          rf.write(ld_st.instr.ld_st_reg.rt, dmem[addr]);
           break;
         case STRBI:
           // need to implement
@@ -367,6 +381,7 @@ void execute() {
       // Essentially the same as the conditional branches, but with no
       // condition check, and an 11-bit immediate field
       decode(uncond);
+      rf.write(PC_REG, PC + 2 * signExtend11to32ui(uncond.instr.b.imm) + 2);
       break;
     case LDM:
       decode(ldm);
