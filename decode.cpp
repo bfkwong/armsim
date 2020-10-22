@@ -121,7 +121,7 @@ ALU_Ops decode (const ALU_Type data) {
   else if (data.instr.sub8i.op == ALU_SUB8I_OP) {
     // 315: insert code here to print subs instruction
     if (opts.instrs) {
-    cout << "sub r" << data.instr.sub8i.rdn << ", #" << setbase(10) << data.instr.sub8i.imm << endl;
+    cout << "subs r" << data.instr.sub8i.rdn << ", #" << setbase(10) << data.instr.sub8i.imm << endl;
   }
     return ALU_SUB8I;
   }
