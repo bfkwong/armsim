@@ -351,15 +351,27 @@ void execute() {
           break;
         case STRBI:
           // need to implement
+          unsigned int mask = 0b11111111;
+          addr = ld_st.instr.ld_st_imm.imm;
+          dmem.write(addr, rf[ld_st.instr.ld_st_imm.rt] & mask);
           break;
         case LDRBI:
           // need to implement
+          unsigned int mask = 0b11111111;
+          addr = ld_st.instr.ld_st_imm.imm;
+          rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr] & mask);
           break;
         case STRBR:
           // need to implement
+          unsigned int mask = 0b11111111;
+          addr = rf[ld_st.instr.ld_st_reg.rn];
+          dmem.write(addr, rf[ld_st.instr.ld_st_reg.rt] & mask);
           break;
         case LDRBR:
           // need to implement
+          unsigned int mask = 0b11111111;
+          addr = rf[ld_st.instr.ld_st_reg.rn];
+          rf.write(ld_st.instr.ld_st_reg.rt, dmem[addr] & mask);
           break;
       }
       break;
