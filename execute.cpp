@@ -16,7 +16,17 @@ Caches caches(0);
 // in addition to the ones given below, specifically for the unconditional
 // branch instruction, which has an 11-bit immediate field
 unsigned int signExtend11to32ui(short i) {
-  return static_cast<unsigned int>(static_cast<int>(i));
+  unsigned int mask = 010000000000;
+  unsigned int result = 0;
+
+  while (mask != 0) {
+    if ((mask & i) != 0) {
+      result += 1;
+    }
+    mask = mask >> 1;
+    result = result << 1;
+  }
+  return result >> 1;
 }
 
 unsigned int signExtend16to32ui(short i) {
@@ -241,6 +251,10 @@ void execute() {
           rf.write(alu.instr.mov.rdn, alu.instr.mov.imm);
           break;
         case ALU_CMP:
+          unsigned int arg1 = rf[alu.instr.cmp.rdn];
+          unsigned int arg2 = signExtend8to32ui(alu.instr.cmp.imm);
+          int result = arg1 - arg2;
+
           break;
         case ALU_ADD8I:
           // needs stats and flags
@@ -354,9 +368,27 @@ void execute() {
       switch (misc_ops) {
         case MISC_PUSH:
           // need to implement
+          unsigned int mask = 000000001;
+          int i = 0;
+          for (i = 0; i < 8; i++) {
+            if ((mask & misc.instr.push.reg_list) != 0) {
+              rf.write(SP_REG, rf[SP_REG] - 4);
+              dmem.write(rf[SP_REG], rf[i]);
+            }
+            mask = mask << 1;
+          }
           break;
         case MISC_POP:
           // need to implement
+          unsigned int mask = 000000001;
+          int i = 0;
+          for (i = 0; i < 8; i++) {
+            if ((mask & misc.instr.push.reg_list) != 0) {
+              rf.write(i, dmem[rf[SP_REG]]);
+              rf.write(SP_REG, rf[SP_REG] + 4);
+            }
+            mask = mask << 1;
+          }
           break;
         case MISC_SUB:
           // functionally complete, needs stats
@@ -385,11 +417,35 @@ void execute() {
       break;
     case LDM:
       decode(ldm);
+
       // need to implement
+      unsigned int mask = 010000000;
+
+      int ldmCnt = 0;
+      int i = 8;
+      for (i = 7; i >= 0; i--) {
+        if ((mask & ldm.instr.ldm.reg_list) != 0) {
+          rf.write(i, dmem[rf[ldm.instr.ldm.rn] + (ldmCnt * 4)]);
+          ldmCnt += 1;
+        }
+        mask = mask >> 1;
+      }
+
       break;
     case STM:
       decode(stm);
       // need to implement
+      unsigned int mask = 000000001;
+
+      int stmCnt = 0;
+      int i = 0;
+      for (i = 0; i < 8; i++) {
+        if ((mask & stm.instr.stm.reg_list) != 0) {
+          dmem.write(rf[stm.instr.stm.rn] + (stmCnt * 4), rf[i]);
+          stmCnt += 1;
+        }
+        mask = mask << 1;
+      }
       break;
     case LDRL:
       // This instruction is complete, nothing needed
