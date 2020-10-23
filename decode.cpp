@@ -452,7 +452,10 @@ BL_Ops decode (const BL_Type data) {
 }
 
 int decode (const LDM_Type data) {
-  // 315: add code to print ldm 
+  // 315: add code to print ldm
+  if (opts.instrs){
+    cout << "ldm r" << data.instr.ldm.rn << ", " data.instr.ldm.reg_list << endl;//unsure if needs ldm.reg_list part??
+  }
   return LDM;
 }
 
