@@ -215,10 +215,16 @@ LD_ST_Ops decode (const LD_ST_Type data) {
     }
     else if (data.instr.class_type.opB == LD_ST_OPB_LDR) {
       // 315: write code to print ldr
+      if (opts.instrs) {
+        cout << "ldr r" << data.instr.ld_st_reg.rt << ", [r" << data.instr.ld_st_reg.rn << ", " << data.instr.ld_st_reg.rm << "]" << endl;
+      }
       return LDRR;
     }
     else if (data.instr.class_type.opB == LD_ST_OPB_STR) {
       // 315: write code to print str
+      if (opts.instrs) {
+        cout << "str r" << data.instr.ld_st_reg.rt << ", [r" << data.instr.ld_st_reg.rn << ", " << data.instr.ld_st_reg.rm << "]" << endl;
+      }
       return STRR;
     }
   }
