@@ -460,12 +460,18 @@ int decode (const LDM_Type data) {
 }
 
 int decode (const STM_Type data) {
-  // 315: add code to print ldm 
+  // 315: add code to print ldm
+  if (opts.instrs) {
+    cout << "stm r" << data.instr.stm.rn << ", " data.instr.stm.reg_list << endl;
+  }
   return STM;
 }
 
 int decode (const LDRL_Type data) {
   // 315: add code to print ldr
+  if (opts.instrs) {
+    cout << "ldr r" << data.instr.ldrl.rt << ", " data.instr.ldrl.imm << endl;
+  }
   return LDRL;
 }
 
