@@ -192,6 +192,9 @@ SP_Ops decode (const SP_Type data) {
   }
   else if (data.instr.cmp.op == 1) {
     // Here you'll need to SP_CMP similar to above
+     if (opts.instrs) {
+        cout << "cmp sp, sp" << endl;//unsure about this one leave like this for now 
+    }
     return SP_CMP;
   }
   else {
