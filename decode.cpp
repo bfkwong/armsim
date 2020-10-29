@@ -80,7 +80,7 @@ ALU_Ops decode (const ALU_Type data) {
   if (data.instr.lsli.op == ALU_LSLI_OP) {
     // 315: insert code here to print lsls instruction
     if (opts.instrs) {
-    cout << "lsls r" << data.instr.lsli.rd << ", r" << data.instr.lsli.rm << ", #" data.instr.lsli.imm << endl;//not entirely sure about this one??
+    cout << "lsls r" << data.instr.lsli.rd << ", r" << data.instr.lsli.rm << ", #" << data.instr.lsli.imm << endl;//not entirely sure about this one??
     }
     return ALU_LSLI;
   }
@@ -146,7 +146,7 @@ DP_Ops decode (const DP_Type data) {
   if (data.instr.DP_Instr.op == DP_CMP) {
     // 315: insert code here to print cmp instruction
     if (opts.instrs) {
-        cout << "cmp r" << data.instr.DP_Instr.rn << ", r" << data.instr.DP_Instr.rm << endl;
+        cout << "cmp r" << data.instr.DP_Instr.rdn << ", r" << data.instr.DP_Instr.rm << endl;
     }
     return DP_CMP;
   }
@@ -252,7 +252,7 @@ LD_ST_Ops decode (const LD_ST_Type data) {
     if (data.instr.ld_st_imm.op == LD_ST_LDB) {
       // 315: write code to print ldrb
       if (opts.instrs) {
-        cout << "ldrb r" << data.instr.ld_st_immb.rt << ", [r" << data.instr.ld_st_imm.rn << ", #" << setbase(10) << (data.instr.ld_st_imm.imm*4) << "]" << endl;
+        cout << "ldrb r" << data.instr.ld_st_imm.rt << ", [r" << data.instr.ld_st_imm.rn << ", #" << setbase(10) << (data.instr.ld_st_imm.imm*4) << "]" << endl;
       }
       return LDRBI;
     }
