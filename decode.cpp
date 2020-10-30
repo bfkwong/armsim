@@ -186,14 +186,55 @@ SP_Ops decode (const SP_Type data) {
   else if (data.instr.add.op == 0) {
     // Here you'll need to SP_ADD similar to above
     if (opts.instrs) {
-        cout << "add sp, sp, r" << setbase(10) << data.instr.add.rm << endl;//possibly wrong??
+      cout << "add";
+      if (data.instr.add.d) {
+        // These two cases handle stack pointer printing
+        if (data.instr.add.rd == 5) {
+          cout << " sp, r" << setbase(10) << data.instr.add.rm << endl;
+        }
+        else if (data.instr.add.rm == 13) {
+          cout << " r" << setbase(10) << (8+data.instr.add.rd) << ", sp" << endl;
+        }
+        // this case is for registers greater than r7 that aren't sp
+        else {
+          cout << " r" << setbase(10) << (8+data.instr.add.rd) << ", r" << setbase(10) << data.instr.add.rm << endl;
+        }
+      }
+      // another stack pointer case
+      else if (data.instr.add.rm == 13) {
+        cout << " r" << data.instr.add.rd << ", sp" << endl;
+      }
+      else {
+        cout << " r" << setbase(10) << data.instr.add.rd << ", r" << data.instr.add.rm << endl;
+      }
     }
+
     return SP_ADD;
   }
   else if (data.instr.cmp.op == 1) {
     // Here you'll need to SP_CMP similar to above
-     if (opts.instrs) {
-        cout << "cmp sp, sp" << endl;//unsure about this one leave like this for now 
+    if (opts.instrs) {
+      cout << "cmp";
+      if (data.instr.mov.d) {
+        // These two cases handle stack pointer printing
+        if (data.instr.cmp.rd == 5) {
+          cout << " sp, r" << setbase(10) << data.instr.cmp.rm << endl;
+        }
+        else if (data.instr.cmp.rm == 13) {
+          cout << " r" << setbase(10) << (8+data.instr.cmp.rd) << ", sp" << endl;
+        }
+        // this case is for registers greater than r7 that aren't sp
+        else {
+          cout << " r" << setbase(10) << (8+data.instr.cmp.rd) << ", r" << setbase(10) << data.instr.cmp.rm << endl;
+        }
+      }
+      // another stack pointer case
+      else if (data.instr.cmp.rm == 13) {
+        cout << " r" << data.instr.cmp.rd << ", sp" << endl;
+      }
+      else {
+        cout << " r" << setbase(10) << data.instr.cmp.rd << ", r" << data.instr.cmp.rm << endl;
+      }
     }
     return SP_CMP;
   }
