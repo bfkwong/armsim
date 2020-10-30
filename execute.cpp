@@ -540,7 +540,8 @@ void execute() {
             }
             mask = mask << 1;
           }
-          rf.write(PC_REG, 0);
+          rf.write(PC_REG, dmem[rf[SP_REG]]);
+          rf.write(SP_REG, rf[SP_REG] + 4);
           break;
         case MISC_SUB:
           // functionally complete, needs stats
