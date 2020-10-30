@@ -8,6 +8,8 @@
 #define PC rf[PC_REG]
 #define LR rf[LR_REG]
 #define SP rf[SP_REG]
+#define POS31MASK 0b10000000000000000000000000000000
+#define POS7T0MASK 0b11111111
 
 Stats stats;
 Caches caches(0);
@@ -15,6 +17,20 @@ Caches caches(0);
 // CPE 315: you'll need to implement a custom sign-extension function
 // in addition to the ones given below, specifically for the unconditional
 // branch instruction, which has an 11-bit immediate field
+unsigned int signExtend11to32ui(short i) {
+  unsigned int mask = 010000000000;
+  unsigned int result = 0;
+
+  while (mask != 0) {
+    if ((mask & i) != 0) {
+      result += 1;
+    }
+    mask = mask >> 1;
+    result = result << 1;
+  }
+  return result >> 1;
+}
+
 unsigned int signExtend16to32ui(short i) {
   return static_cast<unsigned int>(static_cast<int>(i));
 }
@@ -178,6 +194,9 @@ void execute() {
   int num1, num2, result, BitCount;
   unsigned int bit;
 
+  int rmValue, rnValue, spValue, immValue, stmCnt, ldmCnt;
+  unsigned int arg1, arg2, myMask;
+
   /* Convert instruction to correct type */
   /* Types are described in Section A5 of the armv7 manual */
   BL_Type blupper(instr);
@@ -213,33 +232,141 @@ void execute() {
       add_ops = decode(alu);
       switch (add_ops) {
         case ALU_LSLI:
+          rf.write(alu.instr.lsli.rd,
+                   rf[alu.instr.lsli.rm] << alu.instr.lsli.imm);
+
+          rmValue = rf[alu.instr.lsli.rm];
+          immValue = alu.instr.lsli.imm;
+          result = rmValue << immValue;
+
+          flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
+          flags.Z = (result == 0) ? 1 : 0;
+          flags.C = ((rmValue > 0 && result < 0) || (rmValue < 0 && result > 0))
+                        ? 1
+                        : 0;
+          flags.V = flags.C;
           break;
         case ALU_ADDR:
           // needs stats and flags
           rf.write(alu.instr.addr.rd,
                    rf[alu.instr.addr.rn] + rf[alu.instr.addr.rm]);
+
+          rnValue = rf[alu.instr.addr.rn];
+          rmValue = rf[alu.instr.addr.rm];
+          result = rnValue + rmValue;
+
+          flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
+          flags.Z = (result == 0) ? 1 : 0;
+          flags.C = ((rnValue > 0 && rmValue > 0 && result < 0) ||
+                     (rnValue < 0 && rmValue < 0 && result > 0))
+                        ? 1
+                        : 0;
+          flags.V = flags.C;
           break;
         case ALU_SUBR:
+          rf.write(alu.instr.subr.rd,
+                   rf[alu.instr.subr.rn] - rf[alu.instr.subr.rm]);
+
+          rnValue = rf[alu.instr.subr.rn];
+          rmValue = rf[alu.instr.subr.rm];
+          result = rnValue - rmValue;
+
+          flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
+          flags.Z = (result == 0) ? 1 : 0;
+          flags.C = ((rnValue > 0 && rmValue > 0 && result < 0) ||
+                     (rnValue < 0 && rmValue < 0 && result > 0))
+                        ? 1
+                        : 0;
+          flags.V = flags.C;
           break;
         case ALU_ADD3I:
           // needs stats and flags
           rf.write(alu.instr.add3i.rd,
                    rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
+
+          rnValue = rf[alu.instr.add3i.rn];
+          immValue = alu.instr.add3i.imm;
+          result = rnValue + immValue;
+
+          flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
+          flags.Z = (result == 0) ? 1 : 0;
+          flags.C = ((rnValue > 0 && immValue > 0 && result < 0) ||
+                     (rnValue < 0 && immValue < 0 && result > 0))
+                        ? 1
+                        : 0;
+          flags.V = flags.C;
           break;
         case ALU_SUB3I:
+          rf.write(alu.instr.sub3i.rd,
+                   rf[alu.instr.sub3i.rn] - alu.instr.sub3i.imm);
+
+          rnValue = rf[alu.instr.sub3i.rn];
+          immValue = alu.instr.sub3i.imm;
+          result = rnValue - immValue;
+
+          flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
+          flags.Z = (result == 0) ? 1 : 0;
+          flags.C = ((rnValue > 0 && immValue > 0 && result < 0) ||
+                     (rnValue < 0 && immValue < 0 && result > 0))
+                        ? 1
+                        : 0;
+          flags.V = flags.C;
           break;
         case ALU_MOV:
           // needs stats and flags
           rf.write(alu.instr.mov.rdn, alu.instr.mov.imm);
+
+          result = rf[alu.instr.mov.rdn];
+
+          flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
+          flags.Z = (result == 0) ? 1 : 0;
           break;
         case ALU_CMP:
+          arg1 = rf[alu.instr.cmp.rdn];
+          arg2 = alu.instr.cmp.imm;
+          result = arg1 - arg2;
+
+          flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
+          flags.Z = (result == 0) ? 1 : 0;
+          flags.C = ((rnValue > 0 && immValue > 0 && result < 0) ||
+                     (rnValue < 0 && immValue < 0 && result > 0))
+                        ? 1
+                        : 0;
+          flags.V = flags.C;
           break;
         case ALU_ADD8I:
           // needs stats and flags
+
+          rnValue = rf[alu.instr.add8i.rdn];
+          immValue = alu.instr.add8i.imm;
+          result = rnValue + immValue;
+
+          flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
+          flags.Z = (result == 0) ? 1 : 0;
+          flags.C = ((rnValue > 0 && immValue > 0 && result < 0) ||
+                     (rnValue < 0 && immValue < 0 && result > 0))
+                        ? 1
+                        : 0;
+          flags.V = flags.C;
+
           rf.write(alu.instr.add8i.rdn,
                    rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
           break;
         case ALU_SUB8I:
+          rnValue = rf[alu.instr.sub8i.rdn];
+          immValue = alu.instr.sub8i.imm;
+          result = rnValue - immValue;
+
+          flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
+          flags.Z = (result == 0) ? 1 : 0;
+          flags.C = ((rnValue > 0 && immValue > 0 && result < 0) ||
+                     (rnValue < 0 && immValue < 0 && result > 0))
+                        ? 1
+                        : 0;
+          flags.V = flags.C;
+
+          rf.write(alu.instr.sub8i.rdn,
+                   rf[alu.instr.sub8i.rdn] - alu.instr.sub8i.imm);
           break;
         default:
           cout << "instruction not implemented" << endl;
@@ -291,15 +418,54 @@ void execute() {
       switch (sp_ops) {
         case SP_MOV:
           // needs stats and flags
+          result = rf[sp.instr.mov.rm];
+
+          flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
+          flags.Z = (result == 0) ? 1 : 0;
+
           rf.write((sp.instr.mov.d << 3) | sp.instr.mov.rd,
                    rf[sp.instr.mov.rm]);
           break;
         case SP_ADD:
+          if (sp.instr.add.rm == SP_REG) {  // special case: ADD (SP + reg)
+            rnValue = rf[(sp.instr.add.d << 3) | sp.instr.add.rd];
+            spValue = SP;
+            result = spValue + rnValue;
+
+            flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
+            flags.Z = (result == 0) ? 1 : 0;
+            flags.C = ((rnValue > 0 && spValue > 0 && result < 0) ||
+                       (rnValue < 0 && spValue < 0 && result > 0))
+                          ? 1
+                          : 0;
+            flags.V = flags.C;
+
+            rf.write((sp.instr.add.d << 3) | sp.instr.add.rd,
+                     SP + rf[(sp.instr.add.d << 3) | sp.instr.add.rd]);
+          }
+          break;
         case SP_CMP:
-          // need to implement these
+          if (sp.instr.cmp.rm == SP_REG) {
+            rnValue = rf[(sp.instr.cmp.d << 3) | sp.instr.cmp.rd];
+            spValue = SP;
+            result = rnValue - spValue;
+
+            flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
+            flags.Z = (result == 0) ? 1 : 0;
+            flags.C = ((rnValue > 0 && spValue > 0 && result < 0) ||
+                       (rnValue < 0 && spValue < 0 && result > 0))
+                          ? 1
+                          : 0;
+            flags.V = flags.C;
+          }
           break;
       }
       break;
+
+      /////////////////////////////////////
+      ///// NO FLAGS FROM HERE ON OUT /////
+      /////////////////////////////////////
+
     case LD_ST:
       // You'll want to use these load and store models
       // to implement ldrb/strb, ldm/stm and push/pop
@@ -316,22 +482,34 @@ void execute() {
           rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr]);
           break;
         case STRR:
-          // need to implement
+          addr =
+              rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm] * 4;
+          dmem.write(addr, rf[ld_st.instr.ld_st_reg.rt]);
           break;
         case LDRR:
-          // need to implement
+          addr =
+              rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm] * 4;
+          rf.write(ld_st.instr.ld_st_reg.rt, dmem[addr]);
           break;
         case STRBI:
           // need to implement
+          addr = ld_st.instr.ld_st_imm.imm;
+          dmem.write(addr, rf[ld_st.instr.ld_st_imm.rt] & POS7T0MASK);
           break;
         case LDRBI:
           // need to implement
+          addr = ld_st.instr.ld_st_imm.imm;
+          rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr] & POS7T0MASK);
           break;
         case STRBR:
           // need to implement
+          addr = rf[ld_st.instr.ld_st_reg.rn];
+          dmem.write(addr, rf[ld_st.instr.ld_st_reg.rt] & POS7T0MASK);
           break;
         case LDRBR:
           // need to implement
+          addr = rf[ld_st.instr.ld_st_reg.rn];
+          rf.write(ld_st.instr.ld_st_reg.rt, dmem[addr] & POS7T0MASK);
           break;
       }
       break;
@@ -340,9 +518,30 @@ void execute() {
       switch (misc_ops) {
         case MISC_PUSH:
           // need to implement
+          mask = 000000001;
+          for (i = 0; i < 8; i++) {
+            if ((mask & misc.instr.push.reg_list) != 0) {
+              rf.write(SP_REG, rf[SP_REG] - 4);
+              dmem.write(rf[SP_REG], rf[i]);
+            }
+            mask = mask << 1;
+          }
+          rf.write(SP_REG, rf[SP_REG] - 4);
+          dmem.write(rf[SP_REG], LR);
           break;
         case MISC_POP:
           // need to implement
+          mask = 000000001;
+
+          for (i = 0; i < 8; i++) {
+            if ((mask & misc.instr.pop.reg_list) != 0) {
+              rf.write(i, dmem[rf[SP_REG]]);
+              rf.write(SP_REG, rf[SP_REG] + 4);
+            }
+            mask = mask << 1;
+          }
+          rf.write(PC_REG, dmem[rf[SP_REG]]);
+          rf.write(SP_REG, rf[SP_REG] + 4);
           break;
         case MISC_SUB:
           // functionally complete, needs stats
@@ -367,14 +566,37 @@ void execute() {
       // Essentially the same as the conditional branches, but with no
       // condition check, and an 11-bit immediate field
       decode(uncond);
+      rf.write(PC_REG, PC + 2 * signExtend11to32ui(uncond.instr.b.imm) + 2);
       break;
     case LDM:
       decode(ldm);
+
       // need to implement
+      mask = 010000000;
+
+      ldmCnt = 0;
+      for (i = 7; i >= 0; i--) {
+        if ((mask & ldm.instr.ldm.reg_list) != 0) {
+          rf.write(i, dmem[rf[ldm.instr.ldm.rn] + (ldmCnt * 4)]);
+          ldmCnt += 1;
+        }
+        mask = mask >> 1;
+      }
+
       break;
     case STM:
       decode(stm);
       // need to implement
+      mask = 000000001;
+
+      stmCnt = 0;
+      for (i = 0; i < 8; i++) {
+        if ((mask & stm.instr.stm.reg_list) != 0) {
+          dmem.write(rf[stm.instr.stm.rn] + (stmCnt * 4), rf[i]);
+          stmCnt += 1;
+        }
+        mask = mask << 1;
+      }
       break;
     case LDRL:
       // This instruction is complete, nothing needed
