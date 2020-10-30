@@ -526,18 +526,21 @@ void execute() {
             }
             mask = mask << 1;
           }
+          rf.write(SP_REG, rf[SP_REG] - 4);
+          dmem.write(rf[SP_REG], LR);
           break;
         case MISC_POP:
           // need to implement
           mask = 000000001;
+
           for (i = 0; i < 8; i++) {
-            if ((mask & misc.instr.push.reg_list) != 0) {
+            if ((mask & misc.instr.pop.reg_list) != 0) {
               rf.write(i, dmem[rf[SP_REG]]);
               rf.write(SP_REG, rf[SP_REG] + 4);
             }
             mask = mask << 1;
           }
-          rf.write(15, 0);
+          rf.write(PC_REG, 0);
           break;
         case MISC_SUB:
           // functionally complete, needs stats

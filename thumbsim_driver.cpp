@@ -22,9 +22,6 @@ void Memory<Data8, Data32>::write(const unsigned int addr, const Data32 data) {
   for (i = 0 ; i < 4 ; i++) {
     m[myAddr+i] = Data8(data.data_ubyte4(i));
   }
-
-  // cout << hex << addr << endl;
-
 }
 
 template<>
