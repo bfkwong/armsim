@@ -22,6 +22,9 @@ void Memory<Data8, Data32>::write(const unsigned int addr, const Data32 data) {
   for (i = 0 ; i < 4 ; i++) {
     m[myAddr+i] = Data8(data.data_ubyte4(i));
   }
+
+  // cout << hex << addr << endl;
+
 }
 
 template<>
@@ -99,9 +102,9 @@ void Memory<Data32, Data32>::dump(DataType dt) const {
   }
 }
 
-// CPE 315: You must implement and call this function for each 
-// memory address (dmem only) accessed by the program. It should return 
-// true for a cache hit and false for a cache miss, and on a cache miss, 
+// CPE 315: You must implement and call this function for each
+// memory address (dmem only) accessed by the program. It should return
+// true for a cache hit and false for a cache miss, and on a cache miss,
 // should update the cache tags. The "entries" vector contains the cache
 // tags, so if you want to put the tag "t" into cache block "b", then
 // evaluate "entries[b] = t;". The locals you have available to help

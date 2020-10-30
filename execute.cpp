@@ -537,6 +537,7 @@ void execute() {
             }
             mask = mask << 1;
           }
+          rf.write(15, 0);
           break;
         case MISC_SUB:
           // functionally complete, needs stats
