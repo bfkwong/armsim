@@ -194,6 +194,9 @@ void execute() {
   int num1, num2, result, BitCount;
   unsigned int bit;
 
+  int rmValue, rnValue, spValue, immValue, result;
+  unsigned int arg1, arg2, myMask;
+
   /* Convert instruction to correct type */
   /* Types are described in Section A5 of the armv7 manual */
   BL_Type blupper(instr);
@@ -232,9 +235,9 @@ void execute() {
           rf.write(alu.instr.lsli.rd,
                    rf[alu.instr.lsli.rm] << alu.instr.lsli.imm);
 
-          int rmValue = rf[alu.instr.lsli.rm];
-          int immValue = alu.instr.lsli.imm;
-          int result = rmValue << immValue;
+          rmValue = rf[alu.instr.lsli.rm];
+          immValue = alu.instr.lsli.imm;
+          result = rmValue << immValue;
 
           flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
           flags.Z = (result == 0) ? 1 : 0;
@@ -248,9 +251,9 @@ void execute() {
           rf.write(alu.instr.addr.rd,
                    rf[alu.instr.addr.rn] + rf[alu.instr.addr.rm]);
 
-          int rnValue = rf[alu.instr.addr.rn];
-          int rmValue = rf[alu.instr.addr.rm];
-          int result = rnValue + rmValue;
+          rnValue = rf[alu.instr.addr.rn];
+          rmValue = rf[alu.instr.addr.rm];
+          result = rnValue + rmValue;
 
           flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
           flags.Z = (result == 0) ? 1 : 0;
@@ -264,9 +267,9 @@ void execute() {
           rf.write(alu.instr.subr.rd,
                    rf[alu.instr.subr.rn] - rf[alu.instr.subr.rm]);
 
-          int rnValue = rf[alu.instr.subr.rn];
-          int rmValue = rf[alu.instr.subr.rm];
-          int result = rnValue - rmValue;
+          rnValue = rf[alu.instr.subr.rn];
+          rmValue = rf[alu.instr.subr.rm];
+          result = rnValue - rmValue;
 
           flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
           flags.Z = (result == 0) ? 1 : 0;
@@ -281,9 +284,9 @@ void execute() {
           rf.write(alu.instr.add3i.rd,
                    rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
 
-          int rnValue = rf[alu.instr.add3i.rn];
-          int immValue = alu.instr.add3i.imm;
-          int result = rnValue + immValue;
+          rnValue = rf[alu.instr.add3i.rn];
+          immValue = alu.instr.add3i.imm;
+          result = rnValue + immValue;
 
           flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
           flags.Z = (result == 0) ? 1 : 0;
@@ -297,9 +300,9 @@ void execute() {
           rf.write(alu.instr.sub3i.rd,
                    rf[alu.instr.sub3i.rn] - alu.instr.sub3i.imm);
 
-          int rnValue = rf[alu.instr.sub3i.rn];
-          int immValue = alu.instr.sub3i.imm;
-          int result = rnValue - immValue;
+          rnValue = rf[alu.instr.sub3i.rn];
+          immValue = alu.instr.sub3i.imm;
+          result = rnValue - immValue;
 
           flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
           flags.Z = (result == 0) ? 1 : 0;
@@ -313,15 +316,15 @@ void execute() {
           // needs stats and flags
           rf.write(alu.instr.mov.rdn, alu.instr.mov.imm);
 
-          int result = rf[alu.instr.mov.rdn];
+          result = rf[alu.instr.mov.rdn];
 
           flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
           flags.Z = (result == 0) ? 1 : 0;
           break;
         case ALU_CMP:
-          unsigned int arg1 = rf[alu.instr.cmp.rdn];
-          unsigned int arg2 = alu.instr.cmp.imm;
-          int result = arg1 - arg2;
+          arg1 = rf[alu.instr.cmp.rdn];
+          arg2 = alu.instr.cmp.imm;
+          result = arg1 - arg2;
 
           flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
           flags.Z = (result == 0) ? 1 : 0;
@@ -334,9 +337,9 @@ void execute() {
         case ALU_ADD8I:
           // needs stats and flags
 
-          int rnValue = rf[alu.instr.add8i.rdn];
-          int immValue = alu.instr.add8i.imm;
-          int result = rnValue + immValue;
+          rnValue = rf[alu.instr.add8i.rdn];
+          immValue = alu.instr.add8i.imm;
+          result = rnValue + immValue;
 
           flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
           flags.Z = (result == 0) ? 1 : 0;
@@ -350,9 +353,9 @@ void execute() {
                    rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
           break;
         case ALU_SUB8I:
-          int rnValue = rf[alu.instr.sub8i.rdn];
-          int immValue = alu.instr.sub8i.imm;
-          int result = rnValue - immValue;
+          rnValue = rf[alu.instr.sub8i.rdn];
+          immValue = alu.instr.sub8i.imm;
+          result = rnValue - immValue;
 
           flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
           flags.Z = (result == 0) ? 1 : 0;
@@ -415,7 +418,7 @@ void execute() {
       switch (sp_ops) {
         case SP_MOV:
           // needs stats and flags
-          int result = rf[sp.instr.mov.rm];
+          result = rf[sp.instr.mov.rm];
 
           flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
           flags.Z = (result == 0) ? 1 : 0;
@@ -425,9 +428,9 @@ void execute() {
           break;
         case SP_ADD:
           if (sp.instr.add.rm == SP_REG) {  // special case: ADD (SP + reg)
-            int rnValue = rf[(sp.instr.add.d << 3) | sp.instr.add.rd];
-            int spValue = SP;
-            int result = spValue + rnValue;
+            rnValue = rf[(sp.instr.add.d << 3) | sp.instr.add.rd];
+            spValue = SP;
+            result = spValue + rnValue;
 
             flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
             flags.Z = (result == 0) ? 1 : 0;
@@ -443,9 +446,9 @@ void execute() {
           break;
         case SP_CMP:
           if (sp.instr.cmp.rm == SP_REG) {
-            int rnValue = rf[(sp.instr.cmp.d << 3) | sp.instr.cmp.rd];
-            int spValue = SP;
-            int result = rnValue - spValue;
+            rnValue = rf[(sp.instr.cmp.d << 3) | sp.instr.cmp.rd];
+            spValue = SP;
+            result = rnValue - spValue;
 
             flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
             flags.Z = (result == 0) ? 1 : 0;
@@ -515,8 +518,7 @@ void execute() {
       switch (misc_ops) {
         case MISC_PUSH:
           // need to implement
-          unsigned int mask = 000000001;
-          int i = 0;
+          mask = 000000001;
           for (i = 0; i < 8; i++) {
             if ((mask & misc.instr.push.reg_list) != 0) {
               rf.write(SP_REG, rf[SP_REG] - 4);
@@ -527,8 +529,7 @@ void execute() {
           break;
         case MISC_POP:
           // need to implement
-          unsigned int mask = 000000001;
-          int i = 0;
+          mask = 000000001;
           for (i = 0; i < 8; i++) {
             if ((mask & misc.instr.push.reg_list) != 0) {
               rf.write(i, dmem[rf[SP_REG]]);
@@ -566,10 +567,9 @@ void execute() {
       decode(ldm);
 
       // need to implement
-      unsigned int mask = 010000000;
+      mask = 010000000;
 
       int ldmCnt = 0;
-      int i = 8;
       for (i = 7; i >= 0; i--) {
         if ((mask & ldm.instr.ldm.reg_list) != 0) {
           rf.write(i, dmem[rf[ldm.instr.ldm.rn] + (ldmCnt * 4)]);
@@ -582,10 +582,9 @@ void execute() {
     case STM:
       decode(stm);
       // need to implement
-      unsigned int mask = 000000001;
+      mask = 000000001;
 
       int stmCnt = 0;
-      int i = 0;
       for (i = 0; i < 8; i++) {
         if ((mask & stm.instr.stm.reg_list) != 0) {
           dmem.write(rf[stm.instr.stm.rn] + (stmCnt * 4), rf[i]);
