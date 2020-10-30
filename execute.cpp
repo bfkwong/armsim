@@ -194,7 +194,7 @@ void execute() {
   int num1, num2, result, BitCount;
   unsigned int bit;
 
-  int rmValue, rnValue, spValue, immValue, result;
+  int rmValue, rnValue, spValue, immValue, stmCnt, ldmCnt;
   unsigned int arg1, arg2, myMask;
 
   /* Convert instruction to correct type */
@@ -569,7 +569,7 @@ void execute() {
       // need to implement
       mask = 010000000;
 
-      int ldmCnt = 0;
+      ldmCnt = 0;
       for (i = 7; i >= 0; i--) {
         if ((mask & ldm.instr.ldm.reg_list) != 0) {
           rf.write(i, dmem[rf[ldm.instr.ldm.rn] + (ldmCnt * 4)]);
@@ -584,7 +584,7 @@ void execute() {
       // need to implement
       mask = 000000001;
 
-      int stmCnt = 0;
+      stmCnt = 0;
       for (i = 0; i < 8; i++) {
         if ((mask & stm.instr.stm.reg_list) != 0) {
           dmem.write(rf[stm.instr.stm.rn] + (stmCnt * 4), rf[i]);
