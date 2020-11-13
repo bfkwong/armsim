@@ -18,17 +18,7 @@ Caches caches(0);
 // in addition to the ones given below, specifically for the unconditional
 // branch instruction, which has an 11-bit immediate field
 unsigned int signExtend11to32ui(short i) {
-  unsigned int mask = 010000000000;
-  unsigned int result = 0;
-
-  while (mask != 0) {
-    if ((mask & i) != 0) {
-      result += 1;
-    }
-    mask = mask >> 1;
-    result = result << 1;
-  }
-  return result >> 1;
+   return static_cast<unsigned int>(static_cast<int>(static_cast<char>(i)));
 }
 
 unsigned int signExtend16to32ui(short i) {
@@ -46,6 +36,30 @@ ASPR flags;
 // CPE 315: You need to implement a function to set the Negative and Zero
 // flags for each instruction that does that. It only needs to take
 // one parameter as input, the result of whatever operation is executing
+
+unsigned int bitCount(unsigned short n) {
+   unsigned int count = 0;
+   while (n) {
+      n = n & (n - 1);
+      count++;
+   }
+   return count;
+}
+
+void setNegZero(int result) {
+   if ((signed)result == 0) {
+      flags.Z = 1;
+      flags.N = 0;
+   }
+   else if ((signed)result < 0) {
+      flags.N = 1;
+      flags.Z = 0;
+   }
+   else {
+      flags.Z = 0;
+      flags.N = 0;
+   }
+}
 
 // This function is complete, you should not have to modify it
 void setCarryOverflow(int num1, int num2, OFType oftype) {
@@ -409,7 +423,8 @@ void execute() {
       dp_ops = decode(dp);
       switch (dp_ops) {
         case DP_CMP:
-          // need to implement
+          setNegZero((signed)(rf[dp.instr.DP_Instr.rdn] - rf[dp.instr.DP_Instr.rm]));
+          setCarryOverflow(rf[dp.instr.DP_Instr.rdn], rf[dp.instr.DP_Instr.rm], OF_SUB);
           break;
       }
       break;
@@ -427,37 +442,14 @@ void execute() {
                    rf[sp.instr.mov.rm]);
           break;
         case SP_ADD:
-          if (sp.instr.add.rm == SP_REG) {  // special case: ADD (SP + reg)
-            rnValue = rf[(sp.instr.add.d << 3) | sp.instr.add.rd];
-            spValue = SP;
-            result = spValue + rnValue;
-
-            flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
-            flags.Z = (result == 0) ? 1 : 0;
-            flags.C = ((rnValue > 0 && spValue > 0 && result < 0) ||
-                       (rnValue < 0 && spValue < 0 && result > 0))
-                          ? 1
-                          : 0;
-            flags.V = flags.C;
-
-            rf.write((sp.instr.add.d << 3) | sp.instr.add.rd,
-                     SP + rf[(sp.instr.add.d << 3) | sp.instr.add.rd]);
-          }
+          result = rf[(sp.instr.add.d << 3 ) | sp.instr.add.rd] + rf[sp.instr.add.rm];
+          rf.write((sp.instr.add.d << 3 ) | sp.instr.add.rd, result);
+          setCarryOverflow(rf[(sp.instr.add.d << 3 ) | sp.instr.add.rd] , rf[sp.instr.add.rm], OF_ADD);
+          setNegZero((signed)result);
           break;
         case SP_CMP:
-          if (sp.instr.cmp.rm == SP_REG) {
-            rnValue = rf[(sp.instr.cmp.d << 3) | sp.instr.cmp.rd];
-            spValue = SP;
-            result = rnValue - spValue;
-
-            flags.N = ((result & POS31MASK) == 0) ? 0 : 1;
-            flags.Z = (result == 0) ? 1 : 0;
-            flags.C = ((rnValue > 0 && spValue > 0 && result < 0) ||
-                       (rnValue < 0 && spValue < 0 && result > 0))
-                          ? 1
-                          : 0;
-            flags.V = flags.C;
-          }
+          setNegZero((signed)(rf[sp.instr.cmp.d << 3  | sp.instr.cmp.rd] - rf[sp.instr.cmp.rm]));
+          setCarryOverflow(rf[(sp.instr.cmp.d << 3 ) | sp.instr.cmp.rd], rf[sp.instr.cmp.rm], OF_SUB);
           break;
       }
       break;
@@ -483,12 +475,12 @@ void execute() {
           break;
         case STRR:
           addr =
-              rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm] * 4;
+              rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm];
           dmem.write(addr, rf[ld_st.instr.ld_st_reg.rt]);
           break;
         case LDRR:
           addr =
-              rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm] * 4;
+              rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm];
           rf.write(ld_st.instr.ld_st_reg.rt, dmem[addr]);
           break;
         case STRBI:
@@ -518,30 +510,44 @@ void execute() {
       switch (misc_ops) {
         case MISC_PUSH:
           // need to implement
-          mask = 000000001;
+          mask = 0x1;
+          BitCount = bitCount(misc.instr.push.reg_list) + misc.instr.push.m;
+          addr = SP - 4 * BitCount;
           for (i = 0; i < 8; i++) {
-            if ((mask & misc.instr.push.reg_list) != 0) {
-              rf.write(SP_REG, rf[SP_REG] - 4);
-              dmem.write(rf[SP_REG], rf[i]);
+            if (misc.instr.push.reg_list & mask) {
+              dmem.write(addr, rf[i]);
+              addr = addr + 4;
             }
-            mask = mask << 1;
+              mask = mask << 1;
           }
-          rf.write(SP_REG, rf[SP_REG] - 4);
-          dmem.write(rf[SP_REG], LR);
+          if (misc.instr.push.m == 1) {
+              dmem.write(addr, LR);
+          }
+          rf.write(SP_REG, SP - 4 * BitCount);
           break;
         case MISC_POP:
           // need to implement
-          mask = 000000001;
-
+          mask = 0x1;
+          BitCount = bitCount(misc.instr.pop.reg_list) + misc.instr.pop.m;
+          addr = SP;
           for (i = 0; i < 8; i++) {
-            if ((mask & misc.instr.pop.reg_list) != 0) {
-              rf.write(i, dmem[rf[SP_REG]]);
-              rf.write(SP_REG, rf[SP_REG] + 4);
+            if (misc.instr.pop.reg_list & mask) {
+              rf.write(i, dmem[addr]);
+              stats.numRegWrites++;
+              stats.numMemReads++;
+              caches.access(addr);
+              addr = addr + 4;
             }
             mask = mask << 1;
           }
-          rf.write(PC_REG, dmem[rf[SP_REG]]);
-          rf.write(SP_REG, rf[SP_REG] + 4);
+          if (misc.instr.pop.m == 1) {
+            rf.write(PC_REG, dmem[addr]);
+            caches.access(addr);
+            stats.numRegWrites++;
+            stats.numMemReads++;
+          }
+
+          rf.write(SP_REG, SP + 4 * BitCount);
           break;
         case MISC_SUB:
           // functionally complete, needs stats
@@ -566,37 +572,40 @@ void execute() {
       // Essentially the same as the conditional branches, but with no
       // condition check, and an 11-bit immediate field
       decode(uncond);
-      rf.write(PC_REG, PC + 2 * signExtend11to32ui(uncond.instr.b.imm) + 2);
+      rf.write(PC_REG, PC + 2 * signExtend11to32ui(cond.instr.b.imm) + 2);
       break;
     case LDM:
       decode(ldm);
 
       // need to implement
-      mask = 010000000;
+      BitCount = bitCount(ldm.instr.ldm.reg_list);
+      mask = 0x1;
+      addr = rf[ldm.instr.ldm.rn];
 
-      ldmCnt = 0;
-      for (i = 7; i >= 0; i--) {
-        if ((mask & ldm.instr.ldm.reg_list) != 0) {
-          rf.write(i, dmem[rf[ldm.instr.ldm.rn] + (ldmCnt * 4)]);
-          ldmCnt += 1;
-        }
-        mask = mask >> 1;
+      for (i = 0; i < 8; i++) {
+         if (ldm.instr.ldm.reg_list & mask) {
+            rf.write(i, dmem[addr]);
+            addr = addr + 4;
+         }
+         mask = mask << 1;
       }
-
+      rf.write(ldm.instr.ldm.rn, rf[ldm.instr.ldm.rn] + 4 * BitCount);
       break;
     case STM:
       decode(stm);
       // need to implement
-      mask = 000000001;
-
-      stmCnt = 0;
+      BitCount = bitCount(stm.instr.stm.reg_list);
+      mask = 0x1;
+      addr = rf[stm.instr.stm.rn];
       for (i = 0; i < 8; i++) {
-        if ((mask & stm.instr.stm.reg_list) != 0) {
-          dmem.write(rf[stm.instr.stm.rn] + (stmCnt * 4), rf[i]);
-          stmCnt += 1;
-        }
-        mask = mask << 1;
+         if (stm.instr.stm.reg_list & mask) {
+            dmem.write(addr, rf[i]);
+            addr = addr + 4;
+         }
+         mask = mask << 1;
       }
+      rf.write(stm.instr.stm.rn, rf[stm.instr.stm.rn] + 4 * BitCount);
+
       break;
     case LDRL:
       // This instruction is complete, nothing needed
