@@ -524,7 +524,7 @@ void execute() {
       switch (misc_ops) {
         case MISC_PUSH:
           // need to implement
-          mask = 0x1;
+          mask = 1;
           BitCount = bitCount(misc.instr.push.reg_list) + misc.instr.push.m;
           addr = SP - 4 * BitCount;
           for (i = 0; i < 8; i++) {
@@ -532,7 +532,7 @@ void execute() {
               dmem.write(addr, rf[i]);
               addr = addr + 4;
             }
-              mask = mask << 1;
+            mask = mask << 1;
           }
           if (misc.instr.push.m == 1) {
               dmem.write(addr, LR);
@@ -541,26 +541,19 @@ void execute() {
           break;
         case MISC_POP:
           // need to implement
-          mask = 0x1;
+          mask = 1;
           BitCount = bitCount(misc.instr.pop.reg_list) + misc.instr.pop.m;
           addr = SP;
           for (i = 0; i < 8; i++) {
             if (misc.instr.pop.reg_list & mask) {
               rf.write(i, dmem[addr]);
-              stats.numRegWrites++;
-              stats.numMemReads++;
-              caches.access(addr);
               addr = addr + 4;
             }
             mask = mask << 1;
           }
           if (misc.instr.pop.m == 1) {
             rf.write(PC_REG, dmem[addr]);
-            caches.access(addr);
-            stats.numRegWrites++;
-            stats.numMemReads++;
           }
-
           rf.write(SP_REG, SP + 4 * BitCount);
           break;
         case MISC_SUB:
@@ -591,7 +584,6 @@ void execute() {
       break;
     case LDM:
       decode(ldm);
-
       // need to implement
       BitCount = bitCount(ldm.instr.ldm.reg_list);
       mask = 0x1;
@@ -620,7 +612,6 @@ void execute() {
          mask = mask << 1;
       }
       rf.write(stm.instr.stm.rn, rf[stm.instr.stm.rn] + 4 * BitCount);
-
       break;
     case LDRL:
       // This instruction is complete, nothing needed
