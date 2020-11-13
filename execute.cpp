@@ -39,9 +39,12 @@ ASPR flags;
 
 unsigned int bitCount(unsigned short n) {
    unsigned int count = 0;
-   while (n) {
-      n = n & (n - 1);
-      count++;
+   unsigned int mask = 1;
+   while (mask != 0) {
+       if (mask & n) {
+           count += 1;
+       }
+       mask = mask << 1;
    }
    return count;
 }
@@ -208,7 +211,7 @@ void execute() {
   int num1, num2, result, BitCount;
   unsigned int bit;
 
-  int rmValue, rnValue, spValue, immValue, stmCnt, ldmCnt;
+  int rmValue, rnValue, rdValue, rdnValue, spValue, immValue, stmCnt, ldmCnt;
   unsigned int arg1, arg2, myMask;
 
   /* Convert instruction to correct type */
@@ -423,8 +426,12 @@ void execute() {
       dp_ops = decode(dp);
       switch (dp_ops) {
         case DP_CMP:
-          setNegZero((signed)(rf[dp.instr.DP_Instr.rdn] - rf[dp.instr.DP_Instr.rm]));
-          setCarryOverflow(rf[dp.instr.DP_Instr.rdn], rf[dp.instr.DP_Instr.rm], OF_SUB);
+          rdnValue = rf[dp.instr.DP_Instr.rdn];
+          rmValue = rf[dp.instr.DP_Instr.rm];
+          result = rdnValue - rmValue;
+
+          setNegZero(result);
+          setCarryOverflow(rdnValue, rmValue, OF_SUB);
           break;
       }
       break;
@@ -442,14 +449,21 @@ void execute() {
                    rf[sp.instr.mov.rm]);
           break;
         case SP_ADD:
-          result = rf[(sp.instr.add.d << 3 ) | sp.instr.add.rd] + rf[sp.instr.add.rm];
+          rdValue = rf[(sp.instr.add.d << 3 ) | sp.instr.add.rd];
+          rmValue = rf[sp.instr.add.rm];
+          result = rdValue + rmValue;
           rf.write((sp.instr.add.d << 3 ) | sp.instr.add.rd, result);
-          setCarryOverflow(rf[(sp.instr.add.d << 3 ) | sp.instr.add.rd] , rf[sp.instr.add.rm], OF_ADD);
-          setNegZero((signed)result);
+
+          setCarryOverflow(rdValue , rmValue, OF_ADD);
+          setNegZero(result);
           break;
         case SP_CMP:
-          setNegZero((signed)(rf[sp.instr.cmp.d << 3  | sp.instr.cmp.rd] - rf[sp.instr.cmp.rm]));
-          setCarryOverflow(rf[(sp.instr.cmp.d << 3 ) | sp.instr.cmp.rd], rf[sp.instr.cmp.rm], OF_SUB);
+          rdValue = rf[sp.instr.cmp.d << 3  | sp.instr.cmp.rd];
+          rmValue = rf[sp.instr.cmp.rm];
+          result = rdValue - rmValue;
+
+          setNegZero(result);
+          setCarryOverflow(rdValue, rmValue, OF_SUB);
           break;
       }
       break;
@@ -572,7 +586,8 @@ void execute() {
       // Essentially the same as the conditional branches, but with no
       // condition check, and an 11-bit immediate field
       decode(uncond);
-      rf.write(PC_REG, PC + 2 * signExtend11to32ui(cond.instr.b.imm) + 2);
+      result = PC + 2 * signExtend11to32ui(cond.instr.b.imm) + 2;
+      rf.write(PC_REG, result);
       break;
     case LDM:
       decode(ldm);
