@@ -181,7 +181,7 @@ SP_Ops decode(const SP_Type data) {
         }
         // this case is for registers greater than r7 that aren't sp
         else {
-          cout << " r" << setbase(10) << (8+data.instr.add.rd) << ", r" << setbase(10) << data.instr.add.rm << endl;
+          cout << " r" << setbase(10) << (8+data.instr.add.rd) << ", r" << setbase(10) << (8+data.instr.add.rd) << ", r" << setbase(10) << data.instr.add.rm << endl;
         }
       }
       // another stack pointer case
@@ -189,7 +189,7 @@ SP_Ops decode(const SP_Type data) {
         cout << " r" << data.instr.add.rd << ", sp" << endl;
       }
       else {
-        cout << " r" << setbase(10) << data.instr.add.rd << ", r" << data.instr.add.rm << endl;
+        cout << " r" << setbase(10) << data.instr.add.rd << ", r" << setbase(10) << data.instr.add.rd << ", r" << data.instr.add.rm << endl;
       }
     }
 
@@ -596,7 +596,7 @@ int decode(const LDRL_Type data) {
 int decode(const ADD_SP_Type data) {
   // complete
   if (opts.instrs) {
-    cout << "add r" << data.instr.add.rd << ", sp, #" << data.instr.add.imm * 4
+    cout << "add r" << data.instr.add.rd << ", sp, #" << setbase(10) << data.instr.add.imm * 4
          << endl;
   }
 }
