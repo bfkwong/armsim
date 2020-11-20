@@ -18,7 +18,10 @@ Caches caches(0);
 // in addition to the ones given below, specifically for the unconditional
 // branch instruction, which has an 11-bit immediate field
 unsigned int signExtend11to32ui(short i) {
-   return static_cast<unsigned int>(static_cast<int>(static_cast<char>(i)));
+   char castedChar = static_cast<char>(i); 
+   int castedInt = static_cast<int>(castedChar); 
+   unsigned int castedUint = static_cast<unsigned int>(castedInt); 
+   return castedUint; 
 }
 
 unsigned int signExtend16to32ui(short i) {
@@ -37,7 +40,7 @@ ASPR flags;
 // flags for each instruction that does that. It only needs to take
 // one parameter as input, the result of whatever operation is executing
 
-unsigned int bitCount(unsigned short n) {
+unsigned int numberOfOneBits(unsigned short n) {
    unsigned int count = 0;
    unsigned int mask = 1;
    while (mask != 0) {
@@ -540,7 +543,7 @@ void execute() {
         case STRBI:
           // need to implement
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4;
-          temp = dmem[addr];
+          temp = dmem[addr]; 
           temp.set_data_ubyte4(0, rf[ld_st.instr.ld_st_imm.rt]);
           dmem.write(addr, temp);
 
@@ -562,7 +565,7 @@ void execute() {
         case STRBR:
           // need to implement
           addr = rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm];
-          temp = dmem[addr];
+          temp = dmem[addr]; 
           temp.set_data_ubyte4(0, rf[ld_st.instr.ld_st_reg.rt]);
           dmem.write(addr, temp);
 
@@ -589,7 +592,7 @@ void execute() {
         case MISC_PUSH:
           // need to implement
           mask = 1;
-          BitCount = bitCount(misc.instr.push.reg_list) + misc.instr.push.m;
+          BitCount = numberOfOneBits(misc.instr.push.reg_list) + misc.instr.push.m;
           addr = SP - 4 * BitCount;
 
           for (i = 0; i < 8; i++) {
@@ -611,6 +614,7 @@ void execute() {
               stats.numRegReads++;
               caches.access(addr);
           }
+
           rf.write(SP_REG, SP - 4 * BitCount);
           stats.numRegWrites++;
           stats.numRegReads++;
@@ -618,7 +622,7 @@ void execute() {
         case MISC_POP:
           // need to implement
           mask = 1;
-          BitCount = bitCount(misc.instr.pop.reg_list) + misc.instr.pop.m;
+          BitCount = numberOfOneBits(misc.instr.pop.reg_list) + misc.instr.pop.m;
           addr = SP;
           for (i = 0; i < 8; i++) {
             if (misc.instr.pop.reg_list & mask) {
@@ -630,6 +634,7 @@ void execute() {
             }
             mask = mask << 1;
           }
+
           if (misc.instr.pop.m == 1) {
             rf.write(PC_REG, dmem[addr]);
             caches.access(addr);
@@ -689,7 +694,7 @@ void execute() {
     case LDM:
       decode(ldm);
       // need to implement
-      BitCount = bitCount(ldm.instr.ldm.reg_list);
+      BitCount = numberOfOneBits(ldm.instr.ldm.reg_list);
       mask = 1;
       addr = rf[ldm.instr.ldm.rn];
 
@@ -711,7 +716,7 @@ void execute() {
     case STM:
       decode(stm);
       // need to implement
-      BitCount = bitCount(stm.instr.stm.reg_list);
+      BitCount = numberOfOneBits(stm.instr.stm.reg_list);
       mask = 1;
       addr = rf[stm.instr.stm.rn];
       for (i = 0; i < 8; i++) {
@@ -755,7 +760,7 @@ void execute() {
       rf.write(addsp.instr.add.rd, SP + (addsp.instr.add.imm * 4));
 
       setCarryOverflow(rf[addsp.instr.add.rd], addsp.instr.add.imm, OF_ADD);
-      setNegZero((signed)rf[addsp.instr.add.rd]);
+      setNegZero(rf[addsp.instr.add.rd]);
 
       stats.numRegReads++;
       stats.numRegWrites++;

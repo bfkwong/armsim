@@ -148,7 +148,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -7537,7 +7537,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -7704,7 +7704,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -10109,7 +10109,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -17506,7 +17506,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -17673,7 +17673,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -20398,7 +20398,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -27803,7 +27803,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -27970,7 +27970,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -31015,7 +31015,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -38428,7 +38428,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -38595,7 +38595,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -41960,7 +41960,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -49381,7 +49381,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -49548,7 +49548,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -53233,7 +53233,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -60662,7 +60662,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -60829,7 +60829,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -64834,7 +64834,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -72271,7 +72271,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -72438,7 +72438,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -76763,7 +76763,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -84208,7 +84208,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -84375,7 +84375,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -89020,7 +89020,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -96473,7 +96473,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -96640,7 +96640,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -101605,7 +101605,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -109066,7 +109066,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -109233,7 +109233,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -114518,7 +114518,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -121987,7 +121987,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -122154,7 +122154,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -127759,7 +127759,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -135236,7 +135236,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -135403,7 +135403,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -141328,7 +141328,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -148813,7 +148813,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -148980,7 +148980,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -155225,7 +155225,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -162718,7 +162718,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -162885,7 +162885,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -169450,7 +169450,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -176951,7 +176951,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -177118,7 +177118,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -184003,7 +184003,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -191512,7 +191512,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -191679,7 +191679,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -198884,7 +198884,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -206401,7 +206401,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -206568,7 +206568,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -214093,7 +214093,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -221618,7 +221618,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -221785,7 +221785,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -229630,7 +229630,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -237163,7 +237163,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -237330,7 +237330,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
@@ -245495,7 +245495,7 @@ lsls r2, r2, #2
 adds r6, r2, #0
 mov r9, r3
 lsls r3, r3, #3
-add r6, r8
+add r6, r6, r8
 ldr r4, [pc, #132]
 movs r5, #0
 mov r10, r3
@@ -253036,7 +253036,7 @@ bne 0x84c4
 movs r3, #230
 lsls r3, r3, #2
 adds r2, r3, #0
-add r2, r8
+add r2, r2, r8
 add r3, sp, #8
 ldm r2!, {r0}
 stm r3!, {r0}
@@ -253203,7 +253203,7 @@ lsls r3, r3, #1
 ldr r2, [pc, #100]
 mov r8, r3
 movs r3, #0
-add r8, r12
+add r8, r8, r12
 mov r5, r12
 mov r9, r2
 mov r12, r3
